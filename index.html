@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Albion Refining Calc</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>⚔ ALBION REFINING CALC</h1>
+  <p>Calculadora de Profit por Refinamiento</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+
+    <div class="section">Servidor</div>
+    <div class="tog-group" id="gServer">
+      <button class="tog full on" data-v="west">🌎 Américas</button>
+      <button class="tog full"    data-v="europe">🌍 Europa</button>
+      <button class="tog full"    data-v="east">🌏 Asia</button>
+    </div>
+
+    <div class="section">Recurso</div>
+    <div class="tog-group" id="gResource">
+      <button class="tog on" data-v="WOOD">🪵 Madera</button>
+      <button class="tog"    data-v="FIBER">🌿 Fibra</button>
+      <button class="tog"    data-v="ROCK">🪨 Piedra</button>
+      <button class="tog"    data-v="ORE">⚙️ Metal</button>
+      <button class="tog"    data-v="HIDE">🐾 Cuero</button>
+    </div>
+
+    <div class="section">Tier</div>
+    <div class="tog-group" id="gTier">
+      <button class="tog"    data-v="2">T2</button>
+      <button class="tog"    data-v="3">T3</button>
+      <button class="tog on" data-v="4">T4</button>
+      <button class="tog"    data-v="5">T5</button>
+      <button class="tog"    data-v="6">T6</button>
+      <button class="tog"    data-v="7">T7</button>
+      <button class="tog"    data-v="8">T8</button>
+    </div>
+
+    <div class="section">Encantamiento</div>
+    <div class="tog-group" id="gEnchant">
+      <button class="tog on" data-v="0">.0 Normal</button>
+      <button class="tog"    data-v="1">.1</button>
+      <button class="tog"    data-v="2">.2</button>
+      <button class="tog"    data-v="3">.3</button>
+      <button class="tog"    data-v="4">.4</button>
+    </div>
+
+    <div class="section">Cantidad de Materia Prima</div>
+    <input type="number" id="qty" value="1000" min="1">
+
+    <div class="section">Impuesto de Mercado</div>
+    <div class="tog-group" id="gTax">
+      <button class="tog full on" data-v="8">8% — Sin Premium</button>
+      <button class="tog full"    data-v="4">4% — ⭐ Premium</button>
+    </div>
+
+  </div>
+
+  <button class="calc-btn" id="calcBtn">⚗ CALCULAR PROFIT</button>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div><br>
+    Consultando precios del mercado…
+  </div>
+
+  <div class="error-box" id="error"></div>
+
+  <div id="results">
+
+    <!-- PROFIT HERO -->
+    <div class="card" id="profitCard">
+      <div class="section" id="profitLabel">Profit</div>
+      <div class="profit-cols">
+        <div class="profit-col">
+          <div class="pl">Sin Foco · 36.7%</div>
+          <div class="pv" id="pvNF">—</div>
+          <div class="pu">plata</div>
+        </div>
+        <div class="profit-col">
+          <div class="pl">Con Foco · 53.9%</div>
+          <div class="pv" id="pvF">—</div>
+          <div class="pu">plata</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESGLOSE -->
+    <div class="card">
+      <div class="section">Desglose</div>
+      <div class="row"><span class="rl">Costo total materiales</span>      <span class="rv red"   id="dCost">—</span></div>
+      <div class="row"><span class="rl">Devolución sin foco (36.7%)</span> <span class="rv green" id="dRetNF">—</span></div>
+      <div class="row"><span class="rl">Devolución con foco (53.9%)</span> <span class="rv green" id="dRetF">—</span></div>
+      <div class="row"><span class="rl">Ingreso bruto</span>               <span class="rv"       id="dGross">—</span></div>
+      <div class="row"><span class="rl">Impuesto mercado</span>             <span class="rv red"   id="dTax">—</span></div>
+      <div class="row"><span class="rl">Ingreso neto</span>                 <span class="rv cyan"  id="dNet">—</span></div>
+      <div class="tip">💡 Fórmula: <em>Ingreso neto + Devolución − Costo materiales</em></div>
+    </div>
+
+    <!-- COMPRAR -->
+    <div class="card">
+      <div class="section">Dónde Comprar</div>
+
+      <span class="tag buy" id="tagRaw"></span>
+      <table>
+        <thead><tr><th>Ciudad</th><th>Precio</th></tr></thead>
+        <tbody id="tbRaw"></tbody>
+      </table>
+
+      <hr class="divider" id="divPrev">
+      <span class="tag buy" id="tagPrev"></span>
+      <table id="tblPrev">
+        <thead><tr><th>Ciudad</th><th>Precio</th></tr></thead>
+        <tbody id="tbPrev"></tbody>
+      </table>
+    </div>
+
+    <!-- VENDER -->
+    <div class="card">
+      <div class="section">Dónde Vender</div>
+      <span class="tag sell" id="tagSell"></span>
+      <table>
+        <thead><tr><th>Ciudad</th><th>Precio</th></tr></thead>
+        <tbody id="tbSell"></tbody>
+      </table>
+    </div>
+
+    <!-- MATERIALES -->
+    <div class="card">
+      <div class="section">Materiales Necesarios</div>
+      <div id="matList"></div>
+      <div class="tip">🔄 La devolución aplica refinando en la ciudad bonus del recurso. % mostrado con Spec 0 — con mayor Spec la devolución aumenta.</div>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /wrap -->
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --gold:      #f0c040;
+  --gold-dark: #a07820;
+  --gold-glow: rgba(240,192,64,0.35);
+  --bg:        #0f0e0b;
+  --bg-card:   #1a1810;
+  --bg-input:  #131209;
+  --border:    #332d18;
+  --border-hi: #5a4e28;
+  --text:      #f0e8d0;
+  --text-dim:  #7a7060;
+  --green:     #3ddc7a;
+  --green-bg:  rgba(61,220,122,0.1);
+  --red:       #ff5252;
+  --red-bg:    rgba(255,82,82,0.1);
+  --cyan:      #38d4f0;
+  --cyan-bg:   rgba(56,212,240,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type=number] { -moz-appearance: textfield; }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(180deg, #1a1608 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 20px 20px;
+  text-align: center;
+  position: relative;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 40px var(--gold-glow), 0 2px 4px rgba(0,0,0,0.8);
+}
+header p {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* ── LAYOUT ── */
+.wrap {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 18px;
+  margin-bottom: 14px;
+}
+
+/* ── SECTION TITLE ── */
+.section {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-hi), transparent);
+}
+
+/* ── TOGGLE BUTTONS ── */
+.tog-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.tog {
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-dim);
+  user-select: none;
+}
+.tog:hover {
+  border-color: var(--border-hi);
+  color: var(--text);
+  background: #1f1d12;
+}
+.tog.on {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #2a2208, #1a1508);
+  color: var(--gold);
+  box-shadow: 0 0 14px var(--gold-glow), inset 0 1px 0 rgba(240,192,64,0.15);
+}
+.tog.full { flex: 1; text-align: center; }
+
+/* ── INPUT ── */
+input[type=number] {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type=number]:focus {
+  border-color: var(--gold-dark);
+  box-shadow: 0 0 0 3px rgba(240,192,64,0.1);
+}
+
+/* ── CALCULATE BUTTON ── */
+.calc-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid var(--gold-dark);
+  background: linear-gradient(135deg, #2a1f04, #5a3e08, #2a1f04);
+  background-size: 200% 100%;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 24px rgba(240,192,64,0.2), inset 0 1px 0 rgba(240,192,64,0.1);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.calc-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; right: 100%; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(240,192,64,0.15), transparent);
+  transition: all 0.5s;
+}
+.calc-btn:hover {
+  background-position: 100% 0;
+  box-shadow: 0 4px 32px rgba(240,192,64,0.35), inset 0 1px 0 rgba(240,192,64,0.2);
+  border-color: var(--gold);
+  color: #fff8e0;
+}
+.calc-btn:hover::before { left: 100%; right: -100%; }
+.calc-btn:active { transform: scale(0.99); }
+.calc-btn:disabled {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-dim);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── LOADING ── */
+.loading {
+  text-align: center;
+  padding: 28px;
+  color: var(--text-dim);
+  display: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+.spinner {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── ERROR ── */
+.error-box {
+  display: none;
+  background: var(--red-bg);
+  border: 1px solid rgba(255,82,82,0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--red);
+  font-size: 0.9rem;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+#results { display: none; }
+
+/* ── PROFIT HERO ── */
+.profit-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.profit-col {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.profit-col .pl {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.profit-col .pv {
+  font-family: 'Cinzel', serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.profit-col .pu {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── DESGLOSE ROWS ── */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.row:last-of-type { border-bottom: none; }
+.rl { color: var(--text-dim); font-size: 0.88rem; }
+.rv { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.rv.red   { color: var(--red); }
+.rv.green { color: var(--green); }
+.rv.cyan  { color: var(--cyan); }
+
+/* ── PRICE TABLES ── */
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th {
+  text-align: left;
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-hi);
+}
+th:last-child { text-align: right; }
+td {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  color: #a09878;
+  font-size: 0.9rem;
+}
+td:last-child { text-align: right; font-weight: 700; }
+tr:last-child td { border-bottom: none; }
+
+tr.best td { color: var(--text) !important; }
+tr.best td:first-child { color: var(--gold) !important; font-weight: 600; }
+tr.best td:first-child::before { content: '★ '; }
+
+/* ── TAGS ── */
+.tag {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.tag.buy  { color: var(--cyan);  background: var(--cyan-bg);  }
+.tag.sell { color: var(--green); background: var(--green-bg); }
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+/* ── TIP BOX ── */
+.tip {
+  margin-top: 14px;
+  background: rgba(240,192,64,0.05);
+  border: 1px solid rgba(240,192,64,0.15);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.tip em { color: #a09050; font-style: normal; font-weight: 600; }
+
+.no-data {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  padding: 8px 0;
+}
