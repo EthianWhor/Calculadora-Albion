@@ -78,6 +78,8 @@ function fmt(n) {
 function groupPrices(data) {
   const map = {};
   for (const e of data) {
+    // Solo quality 1 (normal) tiene datos reales para materiales de refinamiento
+    if (e.quality !== 1) continue;
     if (!map[e.item_id]) map[e.item_id] = {};
     map[e.item_id][e.city] = {
       sell: e.sell_price_min,
