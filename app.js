@@ -127,10 +127,10 @@ function citiesBuy(priceMap, itemId) {
   return filterOutliers(rows).sort((a, b) => a.price - b.price);
 }
 
-// Para VENDER: usa buy_price_max (precio al que alguien compra = lo que recibes tú)
+// Para VENDER: usa sell_price_min con filtro de outliers
 function citiesSell(priceMap, itemId) {
   const rows = getCities()
-    .map(city => ({ city, price: priceMap[itemId]?.[city]?.buy || 0 }))
+    .map(city => ({ city, price: priceMap[itemId]?.[city]?.sell || 0 }))
     .filter(x => x.price > 0);
   return filterOutliers(rows).sort((a, b) => b.price - a.price);
 }
