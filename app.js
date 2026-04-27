@@ -105,11 +105,31 @@ function groupPrices(data) {
   return map;
 }
 
-function sortedCities(priceMap, itemId, ascending) {
-  return CITIES
+function filterOutliers(rows) {
+  if (rows.length === 0) return rows;
+  const sorted = [...rows].sort((a, b) => a.price - b.price);
+  const mid    = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 !== 0
+    ? sorted[mid].price
+    : (sorted[mid - 1].price + sorted[mid].price) / 2;
+  const filtered = rows.filter(x => x.price <= median * 10 && x.price >= median * 0.1);
+  return filtered.length > 0 ? filtered : rows;
+}
+
+// Para COMPRAR: usa sell_price_min (precio al que alguien vende = lo que pagas tú)
+function citiesBuy(priceMap, itemId) {
+  const rows = CITIES
     .map(city => ({ city, price: priceMap[itemId]?.[city]?.sell || 0 }))
-    .filter(x => x.price > 0)
-    .sort((a, b) => ascending ? a.price - b.price : b.price - a.price);
+    .filter(x => x.price > 0);
+  return filterOutliers(rows).sort((a, b) => a.price - b.price);
+}
+
+// Para VENDER: usa buy_price_max (precio al que alguien compra = lo que recibes tú)
+function citiesSell(priceMap, itemId) {
+  const rows = CITIES
+    .map(city => ({ city, price: priceMap[itemId]?.[city]?.buy || 0 }))
+    .filter(x => x.price > 0);
+  return filterOutliers(rows).sort((a, b) => b.price - a.price);
 }
 
 // ── FETCH ─────────────────────────────────────────────────────────────────────
@@ -131,9 +151,9 @@ function calcProfit(pm, resource, tier, enchant, qty, tax) {
   const refOutId  = mkRefId(resource, tier, enchant);
   const refPrevId = getPrevRefId(resource, tier, enchant);
 
-  const rawRows  = sortedCities(pm, rawId,    true);
-  const sellRows = sortedCities(pm, refOutId, false);
-  const prevRows = refPrevId ? sortedCities(pm, refPrevId, true) : [];
+  const rawRows  = citiesBuy(pm, rawId);
+  const sellRows = citiesSell(pm, refOutId);
+  const prevRows = refPrevId ? citiesBuy(pm, refPrevId) : [];
 
   const pRaw  = rawRows[0]?.price  || 0;
   const pSell = sellRows[0]?.price || 0;
@@ -187,9 +207,9 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
       throw new Error('La API no devolvió datos para estos ítems.');
 
     const pm      = groupPrices(data);
-    const rawRows = sortedCities(pm, rawId,    true);
-    const sellRows= sortedCities(pm, refOutId, false);
-    const prevRows= refPrevId ? sortedCities(pm, refPrevId, true) : [];
+    const rawRows = citiesBuy(pm, rawId);
+    const sellRows= citiesSell(pm, refOutId);
+    const prevRows= refPrevId ? citiesBuy(pm, refPrevId) : [];
 
     if (rawRows.length === 0 && sellRows.length === 0)
       throw new Error(
