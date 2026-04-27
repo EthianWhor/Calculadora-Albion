@@ -9,6 +9,19 @@ const RAW_IDS = {
   WOOD:'T{T}_WOOD', FIBER:'T{T}_FIBER', ROCK:'T{T}_ROCK',
   ORE:'T{T}_ORE',   HIDE:'T{T}_HIDE',
 };
+
+// Raw enchanted resources use _LEVEL1/_LEVEL2/_LEVEL3 format (NOT @1/@2/@3)
+// Refined resources and outputs use @1/@2/@3 format
+function mkRawId(resource, tier, enchant) {
+  const base = RAW_IDS[resource].replace('{T}', tier);
+  if (enchant === 0) return base;
+  return base + '_LEVEL' + enchant;
+}
+
+// Refined items (prev ref + output) use @enc format
+function mkRefId(resource, tier, enchant) {
+  return REF_IDS[resource].replace('{T}', tier) + (enchant > 0 ? '@' + enchant : '');
+}
 const REF_IDS = {
   WOOD:'T{T}_PLANKS', FIBER:'T{T}_CLOTH',       ROCK:'T{T}_STONEBLOCK',
   ORE:'T{T}_METALBAR', HIDE:'T{T}_LEATHER',
@@ -19,10 +32,13 @@ const RES_EMOJI= { WOOD:'🪵', FIBER:'🌿', ROCK:'🪨', ORE:'⚙️', HIDE:'�
 const REF_LBL  = { WOOD:'Tablones', FIBER:'Tela', ROCK:'Bloques', ORE:'Barras', HIDE:'Cuero Ref.' };
 
 // r = raw per output, p = refined_prev per output
-// T2 is 1:1 (1 raw -> 1 refined, no prev needed)
+// Verified against official recipe table:
+// T2: 1x raw | T3: 2x raw + 1x T2ref | T4: 2x raw + 1x T3ref
+// T5: 3x raw + 1x T4ref | T6: 4x raw + 1x T5ref
+// T7: 5x raw + 1x T6ref | T8: 5x raw + 1x T7ref
 const RECIPES = {
   2:{r:1,p:0}, 3:{r:2,p:1}, 4:{r:2,p:1},
-  5:{r:3,p:1}, 6:{r:3,p:1}, 7:{r:4,p:1}, 8:{r:4,p:1},
+  5:{r:3,p:1}, 6:{r:4,p:1}, 7:{r:5,p:1}, 8:{r:5,p:1},
 };
 
 const RETURN_NO_FOCUS = 0.367;
@@ -69,9 +85,9 @@ function mkId(template, tier, enchant) {
 // T5-T8 enchanted: prev refined is tier-1 with SAME enchant level
 function getPrevRefId(resource, tier, enchant) {
   if (tier <= 2) return null;
-  if (enchant === 0) return mkId(REF_IDS[resource], tier - 1, 0);
-  if (tier === 4)    return mkId(REF_IDS[resource], tier - 1, 0); // T4 exception
-  return mkId(REF_IDS[resource], tier - 1, enchant); // T5+ same enchant
+  if (enchant === 0) return mkRefId(resource, tier - 1, 0);
+  if (tier === 4)    return mkRefId(resource, tier - 1, 0); // T4 exception
+  return mkRefId(resource, tier - 1, enchant); // T5+ same enchant
 }
 
 function fmt(n) {
@@ -111,8 +127,8 @@ async function fetchPrices(server, ids) {
 
 function calcProfit(pm, resource, tier, enchant, qty, tax) {
   const rec       = RECIPES[tier];
-  const rawId     = mkId(RAW_IDS[resource],  tier,     enchant);
-  const refOutId  = mkId(REF_IDS[resource],  tier,     enchant);
+  const rawId     = mkRawId(resource, tier, enchant);
+  const refOutId  = mkRefId(resource, tier, enchant);
   const refPrevId = getPrevRefId(resource, tier, enchant);
 
   const rawRows  = sortedCities(pm, rawId,    true);
@@ -160,8 +176,8 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
 
   try {
     const rec       = RECIPES[tier];
-    const rawId     = mkId(RAW_IDS[resource],  tier,     enchant);
-    const refOutId  = mkId(REF_IDS[resource],  tier,     enchant);
+    const rawId     = mkRawId(resource, tier, enchant);
+    const refOutId  = mkRefId(resource, tier, enchant);
     const refPrevId = getPrevRefId(resource, tier, enchant);
 
     const ids  = [rawId, refOutId, ...(refPrevId ? [refPrevId] : [])];
@@ -336,9 +352,10 @@ async function runScan() {
     // Build all item IDs for this resource+enchant across all tiers
     const ids = new Set();
     for (const t of TIERS) {
-      ids.add(mkId(RAW_IDS[res],  t,     enc));
-      ids.add(mkId(REF_IDS[res],  t,     enc));
-      if (t > 2) ids.add(mkId(REF_IDS[res], t - 1, enc));
+      ids.add(mkRawId(res, t, enc));
+      ids.add(mkRefId(res, t, enc));
+      const prevId = getPrevRefId(res, t, enc);
+      if (prevId) ids.add(prevId);
     }
 
     try {
