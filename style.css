@@ -346,3 +346,144 @@ tr.best td:first-child::before { content: '★ '; }
   font-size: 0.85rem;
   padding: 8px 0;
 }
+
+/* ── TWO COLUMN LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+  align-items: start;
+}
+.col-main { min-width: 0; }
+.col-side  { position: sticky; top: 20px; }
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .col-side { position: static; }
+}
+
+/* ── SCANNER CARD ── */
+.scanner-card { padding: 20px 18px; }
+
+.scan-desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.scan-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border-hi);
+  background: var(--bg-input);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 14px;
+  letter-spacing: 0.03em;
+}
+.scan-btn:hover {
+  border-color: var(--gold-dark);
+  color: var(--gold);
+  background: #1a1608;
+}
+.scan-btn.scanning {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* PROGRESS BAR */
+.scan-progress { display: none; margin-bottom: 14px; }
+.scan-bar-bg {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.scan-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.scan-info {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* SCAN LIST */
+.scan-list { display: flex; flex-direction: column; gap: 8px; }
+
+.scan-empty {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  padding: 24px 0;
+}
+
+.scan-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.scan-item:hover {
+  border-color: var(--gold-dark);
+  background: #1a1608;
+}
+
+.scan-rank { font-size: 1.3rem; flex-shrink: 0; }
+
+.scan-body { flex: 1; min-width: 0; }
+.scan-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.scan-cities {
+  display: flex;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+.scan-buy  { color: var(--cyan); }
+.scan-sell { color: var(--green); }
+
+.scan-profit { text-align: right; flex-shrink: 0; }
+.scan-pv {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.scan-pl {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 3px;
+}
+.scan-profit.pos .scan-pv { color: var(--green); }
+.scan-profit.neg .scan-pv { color: var(--red); }
