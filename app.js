@@ -63,6 +63,17 @@ function mkId(template, tier, enchant) {
   return template.replace('{T}', tier) + (enchant > 0 ? `@${enchant}` : '');
 }
 
+// Correct prev refined ID per Albion's refining rules:
+// .0 (normal): prev refined is always tier-1 .0
+// T4 enchanted: prev refined is T3 .0 (T4 is the exception — always uses normal T3)
+// T5-T8 enchanted: prev refined is tier-1 with SAME enchant level
+function getPrevRefId(resource, tier, enchant) {
+  if (tier <= 2) return null;
+  if (enchant === 0) return mkId(REF_IDS[resource], tier - 1, 0);
+  if (tier === 4)    return mkId(REF_IDS[resource], tier - 1, 0); // T4 exception
+  return mkId(REF_IDS[resource], tier - 1, enchant); // T5+ same enchant
+}
+
 function fmt(n) {
   if (n == null || isNaN(n)) return '—';
   return Math.round(n).toLocaleString('es-CO');
@@ -102,7 +113,7 @@ function calcProfit(pm, resource, tier, enchant, qty, tax) {
   const rec       = RECIPES[tier];
   const rawId     = mkId(RAW_IDS[resource],  tier,     enchant);
   const refOutId  = mkId(REF_IDS[resource],  tier,     enchant);
-  const refPrevId = tier > 2 ? mkId(REF_IDS[resource], tier - 1, enchant) : null;
+  const refPrevId = getPrevRefId(resource, tier, enchant);
 
   const rawRows  = sortedCities(pm, rawId,    true);
   const sellRows = sortedCities(pm, refOutId, false);
@@ -151,7 +162,7 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     const rec       = RECIPES[tier];
     const rawId     = mkId(RAW_IDS[resource],  tier,     enchant);
     const refOutId  = mkId(REF_IDS[resource],  tier,     enchant);
-    const refPrevId = tier > 2 ? mkId(REF_IDS[resource], tier - 1, enchant) : null;
+    const refPrevId = getPrevRefId(resource, tier, enchant);
 
     const ids  = [rawId, refOutId, ...(refPrevId ? [refPrevId] : [])];
     const data = await fetchPrices(server, ids);
@@ -165,7 +176,12 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     const prevRows= refPrevId ? sortedCities(pm, refPrevId, true) : [];
 
     if (rawRows.length === 0 && sellRows.length === 0)
-      throw new Error('No hay precios registrados para este ítem en este momento. Prueba otro tier o recurso.');
+      throw new Error(
+        `Sin datos de mercado para ${rawId} o ${refOutId}. ` +
+        (enchant > 0
+          ? 'Los materiales encantados tienen menos volumen — prueba en servidor Europa o intenta más tarde.'
+          : 'Prueba otro tier o recurso.')
+      );
 
     const pRaw  = rawRows[0]?.price  || 0;
     const pSell = sellRows[0]?.price || 0;
