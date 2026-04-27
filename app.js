@@ -1,9 +1,11 @@
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 
-const CITIES = [
-  'Lymhurst','Bridgewatch','Martlock',
-  'Thetford','Fort Sterling','Caerleon','Brecilien'
-];
+const ALL_CITIES = ['Lymhurst','Bridgewatch','Martlock','Thetford','Fort Sterling','Caerleon','Brecilien'];
+const BASE_CITIES = ['Lymhurst','Bridgewatch','Martlock','Thetford','Fort Sterling','Caerleon'];
+
+function getCities() {
+  return state.brecilien === 1 ? ALL_CITIES : BASE_CITIES;
+}
 
 const RAW_IDS = {
   WOOD:'T{T}_WOOD', FIBER:'T{T}_FIBER', ROCK:'T{T}_ROCK',
@@ -49,13 +51,13 @@ const ENCHANTS        = [0,1,2,3,4];
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 
-const state = { server:'west', resource:'WOOD', tier:4, enchant:0, qty:1000, tax:8 };
+const state = { server:'west', resource:'WOOD', tier:4, enchant:0, qty:1000, tax:8, brecilien:1 };
 
 // ── TOGGLE GROUPS ─────────────────────────────────────────────────────────────
 
 const GROUP_KEYS = {
   gServer:'server', gResource:'resource',
-  gTier:'tier', gEnchant:'enchant', gTax:'tax'
+  gTier:'tier', gEnchant:'enchant', gTax:'tax', gBrecilien:'brecilien'
 };
 
 Object.entries(GROUP_KEYS).forEach(([gid, key]) => {
@@ -118,15 +120,16 @@ function filterOutliers(rows) {
 
 // Para COMPRAR: usa sell_price_min (precio al que alguien vende = lo que pagas tú)
 function citiesBuy(priceMap, itemId) {
-  const rows = CITIES
+  const rows = getCities()
     .map(city => ({ city, price: priceMap[itemId]?.[city]?.sell || 0 }))
+    // getCities() already filtered per user setting
     .filter(x => x.price > 0);
   return filterOutliers(rows).sort((a, b) => a.price - b.price);
 }
 
 // Para VENDER: usa buy_price_max (precio al que alguien compra = lo que recibes tú)
 function citiesSell(priceMap, itemId) {
-  const rows = CITIES
+  const rows = getCities()
     .map(city => ({ city, price: priceMap[itemId]?.[city]?.buy || 0 }))
     .filter(x => x.price > 0);
   return filterOutliers(rows).sort((a, b) => b.price - a.price);
@@ -135,7 +138,7 @@ function citiesSell(priceMap, itemId) {
 // ── FETCH ─────────────────────────────────────────────────────────────────────
 
 async function fetchPrices(server, ids) {
-  const url = `https://${server}.albion-online-data.com/api/v2/stats/prices/${ids.join(',')}.json?locations=${CITIES.join(',')}&_=${Date.now()}`;
+  const url = `https://${server}.albion-online-data.com/api/v2/stats/prices/${ids.join(',')}.json?locations=${getCities().join(',')}&_=${Date.now()}`;
   const res = await fetch(url);
   if (!res.ok && res.status !== 304) throw new Error(`HTTP ${res.status}`);
   const text = await res.text();
